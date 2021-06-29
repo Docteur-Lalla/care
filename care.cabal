@@ -26,12 +26,14 @@ source-repository head
 library
   exposed-modules:
       Care
+      Care.Value
   other-modules:
       Paths_care
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , containers >=0.6
   default-language: Haskell2010
 
 executable care-exe
@@ -44,6 +46,7 @@ executable care-exe
   build-depends:
       base >=4.7 && <5
     , care
+    , containers >=0.6
   default-language: Haskell2010
 
 test-suite care-test
@@ -57,4 +60,5 @@ test-suite care-test
   build-depends:
       base >=4.7 && <5
     , care
+    , containers >=0.6
   default-language: Haskell2010
