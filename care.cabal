@@ -27,6 +27,7 @@ library
   exposed-modules:
       Care
       Care.Error
+      Care.Parser
       Care.Value
   other-modules:
       Paths_care
