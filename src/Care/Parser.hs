@@ -21,15 +21,9 @@ module Care.Parser (number) where
   number :: Parser CareValue
   number = do
     s <- fmap normalizeSign $ fromMaybe '+' <$> optionMaybe sign
-    int <- integerPart
+    int <- fmap ((++) s) integerPart
     opt <- optionMaybe decimalPart
-    let sint = s ++ int
-    case opt of
-      Just dec -> readNum careFloat $ sint ++ dec
-      Nothing -> readNum careInteger $ sint
-    where readNum :: Read a => (a -> CareValue) -> String -> Parser CareValue
-          readNum ctor = return . ctor . read
-
-          normalizeSign :: Char -> String
+    return $ fromMaybe (readInteger int) $ fmap (readFloat . (++) int) opt
+    where normalizeSign :: Char -> String
           normalizeSign '+' = ""
           normalizeSign '-' = "-"

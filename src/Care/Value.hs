@@ -96,6 +96,15 @@ module Care.Value where
   careFloat :: Double -> CareValue
   careFloat = CareNumber . Floating
 
+  readNumber :: Read a => (a -> CareValue) -> String -> CareValue
+  readNumber ctor = ctor . read
+
+  readInteger :: String -> CareValue
+  readInteger = readNumber careInteger
+
+  readFloat :: String -> CareValue
+  readFloat = readNumber careFloat
+
   -- | Helper to get a haskell string from a care value if it is a care string.
   stringOf :: CareValue -> Maybe String
   stringOf (CareString s) = Just s
