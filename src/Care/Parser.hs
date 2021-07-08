@@ -20,10 +20,9 @@ module Care.Parser (number) where
   -- | Parse a number.
   number :: Parser CareValue
   number = do
-    s <- fmap normalizeSign $ fromMaybe '+' <$> optionMaybe sign
-    int <- fmap ((++) s) integerPart
-    opt <- optionMaybe decimalPart
-    return $ fromMaybe (readInteger int) $ fmap (readFloat . (++) int) opt
+    s <- normalizeSign <$> option '+' sign
+    int <- (s ++) <$> integerPart
+    option (readInteger int) $ readFloat . (int ++) <$> decimalPart
     where normalizeSign :: Char -> String
           normalizeSign '+' = ""
           normalizeSign '-' = "-"
