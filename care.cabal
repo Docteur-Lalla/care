@@ -59,6 +59,7 @@ test-suite care-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      ParserSpec
       Paths_care
   hs-source-dirs:
       test
@@ -67,6 +68,7 @@ test-suite care-test
       base >=4.7 && <5
     , care
     , containers >=0.6
+    , hspec
     , mtl >=2.2
     , parsec >=3.1
   default-language: Haskell2010

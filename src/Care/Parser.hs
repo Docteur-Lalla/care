@@ -20,12 +20,16 @@ module Care.Parser (number) where
   -- | Parse a number.
   number :: Parser CareValue
   number = do
-    s <- fromMaybe '+' <$> optionMaybe sign
+    s <- fmap normalizeSign $ fromMaybe '+' <$> optionMaybe sign
     int <- integerPart
     opt <- optionMaybe decimalPart
-    let sint = s : int
+    let sint = s ++ int
     case opt of
       Just dec -> readNum careFloat $ sint ++ dec
       Nothing -> readNum careInteger $ sint
     where readNum :: Read a => (a -> CareValue) -> String -> Parser CareValue
           readNum ctor = return . ctor . read
+
+          normalizeSign :: Char -> String
+          normalizeSign '+' = ""
+          normalizeSign '-' = "-"
