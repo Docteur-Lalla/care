@@ -1,7 +1,7 @@
 module Care.Value where
   import Data.List (intercalate)
-  import Data.Ratio (numerator, denominator)
   import Data.Map.Strict (Map, toList)
+  import Data.Ratio (numerator, denominator)
 
   -- | The Number data type in care.
   --

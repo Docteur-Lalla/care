@@ -17,12 +17,28 @@ module Care.Parser (number) where
   sign :: Parser Char
   sign = oneOf "-+"
 
-  -- | Parse a number.
-  number :: Parser CareValue
-  number = do
+  -- | Parse a decimal number.
+  decimalNumber :: Parser CareValue
+  decimalNumber = do
     s <- normalizeSign <$> option '+' sign
     int <- (s ++) <$> integerPart
     option (readInteger int) $ readFloat . (int ++) <$> decimalPart
-    where normalizeSign :: Char -> String
-          normalizeSign '+' = ""
-          normalizeSign '-' = "-"
+
+  normalizeSign :: Char -> String
+  normalizeSign '+' = ""
+  normalizeSign '-' = "-"
+
+  applyWhen :: Bool -> (a -> a) -> a -> a
+  applyWhen True = ($)
+  applyWhen False = flip const
+
+  -- | Parse a '0x' prefixed hexadecimal number.
+  hexadecimalNumber :: Parser CareValue
+  hexadecimalNumber = do
+    sign <- (== '-') <$> option '+' sign
+    careInteger . applyWhen sign negate . read <$> literal
+      where literal :: Parser String
+            literal = string "0x" `mappend` many1 hexDigit
+
+  number :: Parser CareValue
+  number = try hexadecimalNumber <|> decimalNumber

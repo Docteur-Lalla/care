@@ -12,10 +12,11 @@ module ParserSpec where
 
   spec :: Spec
   spec = do
-    describe "number" testNumber
+    describe "decimal number" testDecimalNumber
+    describe "hexadecimal number" testHexadecimalNumber
 
-  testNumber :: Spec
-  testNumber = do
+  testDecimalNumber :: Spec
+  testDecimalNumber = do
     it "parses a positive integer" $ do
       parse Parser.number "12" `shouldBe` (Right (careInteger 12))
     it "parses a positive integer prefixed with a plus" $ do
@@ -28,3 +29,12 @@ module ParserSpec where
       parse Parser.number "+12.0" `shouldBe` (Right (careFloat 12.0))
     it "parses a negative float" $ do
       parse Parser.number "-12.0" `shouldBe` (Right $ careFloat (-12.0))
+
+  testHexadecimalNumber :: Spec
+  testHexadecimalNumber = do
+    it "parses a hexadecimal positive number" $ do
+      parse Parser.number "0x10" `shouldBe` (Right (careInteger 16))
+      parse Parser.number "0x5a" `shouldBe` (Right (careInteger 90))
+    it "parses a hexadecimal negative number" $ do
+      parse Parser.number "-0x10" `shouldBe` (Right (careInteger (-16)))
+      parse Parser.number "-0x5a" `shouldBe` (Right (careInteger (-90)))
