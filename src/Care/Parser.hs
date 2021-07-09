@@ -1,9 +1,10 @@
-module Care.Parser (number) where
+module Care.Parser (number, string) where
   import Control.Applicative ((<$>), (<*>))
   import Data.Maybe (fromMaybe)
 
-  import Text.Parsec
-  import Text.Parsec.Char
+  import Text.Parsec hiding (string)
+  import qualified Text.Parsec as P (string)
+  import Text.Parsec.Char hiding (string)
   import Text.Parsec.String
 
   import Care.Value
@@ -38,7 +39,19 @@ module Care.Parser (number) where
     sign <- (== '-') <$> option '+' sign
     careInteger . applyWhen sign negate . read <$> literal
       where literal :: Parser String
-            literal = string "0x" `mappend` many1 hexDigit
+            literal = P.string "0x" `mappend` many1 hexDigit
 
+  -- | Parse a number literal.
   number :: Parser CareValue
   number = try hexadecimalNumber <|> decimalNumber
+
+  -- | Parse a string literal.
+  string :: Parser CareValue
+  string = CareString <$> between (char '"') (char '"') stringContents
+    where stringContents = many (try escapable <|> noneOf "\"")
+          escapable = escape <$> (char '\\' >> oneOf "\\\"nrt")
+          escape '\\' = '\\'
+          escape '"' = '"'
+          escape 'n' = '\n'
+          escape 'r' = '\r'
+          escape 't' = '\t'

@@ -14,6 +14,7 @@ module ParserSpec where
   spec = do
     describe "decimal number" testDecimalNumber
     describe "hexadecimal number" testHexadecimalNumber
+    describe "string literal" testString
 
   testDecimalNumber :: Spec
   testDecimalNumber = do
@@ -38,3 +39,14 @@ module ParserSpec where
     it "parses a hexadecimal negative number" $ do
       parse Parser.number "-0x10" `shouldBe` (Right (careInteger (-16)))
       parse Parser.number "-0x5a" `shouldBe` (Right (careInteger (-90)))
+
+  testString :: Spec
+  testString = do
+    it "parses an empty string literal" $ do
+      parse Parser.string "\"\"" `shouldBe` (Right (CareString ""))
+    it "parses a string without escaped character" $ do
+      parse Parser.string "\"hello world\"" `shouldBe` (Right (CareString "hello world"))
+    it "parses a string with an escaped character" $ do
+      parse Parser.string "\"hello\\nworld\"" `shouldBe` (Right (CareString "hello\nworld"))
+    it "parses a string with an escaped quote character" $ do
+      parse Parser.string "\"hello\\\"world\"" `shouldBe` (Right (CareString "hello\"world"))
