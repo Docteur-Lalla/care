@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Care
+      Care.Ast
       Care.Error
       Care.Parser
       Care.Value
