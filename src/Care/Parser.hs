@@ -1,4 +1,4 @@
-module Care.Parser (number, string) where
+module Care.Parser (number, string, literal, expression) where
   import Control.Applicative ((<$>), (<*>))
   import Data.Maybe (fromMaybe)
 
@@ -7,6 +7,7 @@ module Care.Parser (number, string) where
   import Text.Parsec.Char hiding (string)
   import Text.Parsec.String
 
+  import Care.Ast
   import Care.Value
 
   integerPart :: Parser String
@@ -55,3 +56,17 @@ module Care.Parser (number, string) where
           escape 'n' = '\n'
           escape 'r' = '\r'
           escape 't' = '\t'
+
+  -- | Apply the parser @p@ and return a @Located@ result of the parser @p@.
+  located :: Parser a -> Parser (Located a)
+  located p = do
+    start <- getPosition
+    a <- p
+    end <- getPosition
+    return $ Located { startPosition = start, endPosition = end, value = a }
+
+  literal :: Parser (Located CareValue)
+  literal = located $ string <|> number
+
+  expression :: Parser (Located Expr)
+  expression = fmap Literal <$> located literal

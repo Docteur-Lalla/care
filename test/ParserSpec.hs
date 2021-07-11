@@ -1,9 +1,10 @@
 module ParserSpec where
   import Test.Hspec
 
-  import Text.Parsec (ParseError, runParser)
+  import Text.Parsec (ParseError, runParser, sourceColumn, sourceLine)
   import Text.Parsec.String (Parser)
 
+  import Care.Ast
   import qualified Care.Parser as Parser
   import Care.Value
 
@@ -15,6 +16,7 @@ module ParserSpec where
     describe "decimal number" testDecimalNumber
     describe "hexadecimal number" testHexadecimalNumber
     describe "string literal" testString
+    describe "literal expression" testLiteralExpression
 
   testDecimalNumber :: Spec
   testDecimalNumber = do
@@ -50,3 +52,16 @@ module ParserSpec where
       parse Parser.string "\"hello\\nworld\"" `shouldBe` (Right (CareString "hello\nworld"))
     it "parses a string with an escaped quote character" $ do
       parse Parser.string "\"hello\\\"world\"" `shouldBe` (Right (CareString "hello\"world"))
+
+  tripleFromResult :: Located a -> ((Int, Int), (Int, Int), a)
+  tripleFromResult loc = (start, end, value loc)
+    where start = pair $ startPosition loc
+          end = pair $ endPosition loc
+          pair pos = (sourceLine pos, sourceColumn pos)
+
+  testLiteralExpression :: Spec
+  testLiteralExpression = do
+    it "parses a string literal" $ do
+      let res = parse Parser.literal "\"suus\""
+      let triple = fmap tripleFromResult res
+      triple `shouldBe` (Right ((1, 1), (1, 7), CareString "suus"))
