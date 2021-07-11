@@ -62,6 +62,8 @@ module ParserSpec where
   testLiteralExpression :: Spec
   testLiteralExpression = do
     it "parses a string literal" $ do
-      let res = parse Parser.literal "\"suus\""
-      let triple = fmap tripleFromResult res
+      let triple = fmap tripleFromResult $ parse Parser.literal "\"suus\""
       triple `shouldBe` (Right ((1, 1), (1, 7), CareString "suus"))
+    it "parses a number literal" $ do
+      let triple = fmap tripleFromResult $ parse Parser.literal "0.123"
+      triple `shouldBe` (Right ((1, 1), (1, 6), careFloat 0.123))
